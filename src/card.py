@@ -63,6 +63,11 @@ def add_cards(deck: Deck, cards: Union[Sequence[Card], Card, Deck]) -> Deck:
         )
 
 
+def count_number_cards(hand: Deck) -> int:
+    number_cards = [x for x in hand if isinstance(x, NumberCard)]
+    return len(number_cards)
+
+
 def value_hand(hand: Deck) -> int:
     if ModifierCard.X2 in hand:
         mult = 2
@@ -70,15 +75,13 @@ def value_hand(hand: Deck) -> int:
         mult = 1
 
     value = 0
-    number_cards = 0
     for card in hand:
         match card:
             case NumberCard():
                 value += card.value
-                number_cards += 1
             case ModifierCard():
                 value += card.value
-    if number_cards == 7:
+    if count_number_cards(hand) == 7:
         value += 15
     return mult * value
 
@@ -87,3 +90,9 @@ def draw_card(deck: Deck) -> Tuple[Card, Deck]:
     idx = random.randrange(len(deck))
     card, deck = pop_deck(deck, idx)
     return card, deck
+
+
+def card_index(deck: Deck, card: Card):
+    if card not in deck:
+        raise ValueError("Card {card} not found in deck!")
+    return deck.cards.index(card)
