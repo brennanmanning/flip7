@@ -1,14 +1,8 @@
 from dataclasses import dataclass
 from typing import List, Union
 
+from game_state import GameState, GamePhase
 from card import SpecialCard
-from game import (
-    GameState,
-    player_draw,
-    handle_stay,
-    GamePhase,
-    handle_special_card_targeting,
-)
 from player import check_for_card
 
 
@@ -44,16 +38,14 @@ def get_special_card_actions(gs: GameState) -> List[PostDrawAction]:
     match gs.pending_card:
         case SpecialCard.FREEZE | SpecialCard.FLIP3:
             valid_targets = []
-            for i, player in enumerate(gs.players):
-                if not player.frozen_p:
+            for i, p in enumerate(gs.players):
+                if not p.frozen_p:
                     valid_targets.append(TargetPlayerAction(i))
             return valid_targets
         case SpecialCard.CHANCE2:
             valid_targets = []
-            for i, player in enumerate(gs.players):
-                if not player.frozen_p and not check_for_card(
-                    player, SpecialCard.CHANCE2
-                ):
+            for i, p in enumerate(gs.players):
+                if not p.frozen_p and not check_for_card(p, SpecialCard.CHANCE2):
                     valid_targets.append(TargetPlayerAction(i))
             return valid_targets
         case _:
@@ -69,17 +61,3 @@ def get_legal_actions(gs: GameState) -> List[Union[TurnStartAction, PostDrawActi
             return actions
         case GamePhase.POSTDRAW:
             return get_special_card_actions(gs)
-
-
-def apply_action(
-    gs: GameState, action: Union[TurnStartAction, PostDrawAction]
-) -> GameState:
-    match (gs.phase, action):
-        case (GamePhase.TURNSTART, DrawAction()):
-            return player_draw(gs)
-        case (GamePhase.TURNSTART, StayAction()):
-            return handle_stay(gs)
-        case (GamePhase.POSTDRAW, TargetPlayerAction(target_idx)):
-            return handle_special_card_targeting(gs, target_idx)
-        case _:
-            raise ValueError(f"Invalid action {action} for phase {gs.phase}")
