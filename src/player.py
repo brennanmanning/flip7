@@ -19,6 +19,10 @@ def freeze_player(player: Player) -> Player:
     return dataclasses.replace(player, frozen_p=True)
 
 
+def unfreeze_player(player: Player) -> Player:
+    return dataclasses.replace(player, frozen_p=False)
+
+
 def check_for_card(player: Player, card: Card) -> bool:
     return card in player.hand
 

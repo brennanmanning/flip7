@@ -4,7 +4,7 @@ from actions import get_legal_actions
 from game_state import GameState, GamePhase, new_game
 import game_state as game
 from game_logic import all_players_frozen_p, apply_action, get_input
-from player import empty_hand, update_score
+from player import empty_hand, unfreeze_player, update_score
 from utils import bounded_add
 
 
@@ -33,6 +33,7 @@ def round(gs: GameState) -> GameState:
     for p in gs.players:
         p = update_score(p)
         p = empty_hand(p)
+        p = unfreeze_player(p)
         new_players.append(p)
     gs = game.update_players(gs, tuple(new_players))
     return gs

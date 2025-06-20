@@ -76,13 +76,13 @@ def apply_action(
 def player_draw(gs: GameState) -> GameState:
     if not gs.round_active:
         return gs
+    if len(gs.deck) == 0:
+        gs = refill_deck(gs)
     gs = game.update_game_phase(gs, GamePhase.POSTDRAW)
     p = gs.players[gs.current_player_idx]
     if p.frozen_p:
         return gs
     card, gs = game.draw_card_deck(gs)
-    if len(gs.deck) == 0:
-        gs = refill_deck(gs)
     match card:
         case SpecialCard.CHANCE2:
             if check_for_card(p, card):
